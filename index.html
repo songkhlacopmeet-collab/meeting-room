@@ -43,43 +43,6 @@
             font-size: 1.1em;
         }
 
-        .setup-notice {
-            background: #fef3c7;
-            color: #92400e;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border-left: 4px solid #f59e0b;
-        }
-
-        .setup-notice h3 {
-            margin-bottom: 10px;
-        }
-
-        .setup-notice input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 2px solid #f59e0b;
-            border-radius: 5px;
-            font-size: 1em;
-        }
-
-        .setup-notice button {
-            background: #f59e0b;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1em;
-        }
-
-        .setup-notice button:hover {
-            background: #d97706;
-        }
-
         .nav-tabs {
             display: flex;
             gap: 10px;
@@ -528,17 +491,6 @@
             <p>สำนักงานตำรวจภูธรจังหวัดสงขลา (Google Sheets Version)</p>
         </div>
 
-        <!-- Setup Notice -->
-        <div class="setup-notice" id="setupNotice">
-            <h3>⚙️ ตั้งค่าการเชื่อมต่อ Google Sheets</h3>
-            <p>กรุณาใส่ URL ของ Google Apps Script Web App:</p>
-            <input type="text" id="apiUrlInput" placeholder="https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec">
-            <button onclick="saveApiUrl()">บันทึก URL</button>
-            <p style="margin-top: 10px; font-size: 0.9em;">
-                <strong>หมายเหตุ:</strong> คุณจะได้ URL นี้หลังจาก Deploy Google Apps Script เป็น Web App
-            </p>
-        </div>
-
         <div class="nav-tabs">
             <button class="tab-btn active" id="tab-booking">📅 จองห้องประชุม</button>
             <button class="tab-btn" id="tab-summary">📊 สรุปการประชุมรายสัปดาห์</button>
@@ -575,8 +527,8 @@
     </div>
 
     <script>
-        // Configuration
-        let API_URL = localStorage.getItem('googlesheet_api_url') || '';
+        // Configuration - API URL ฝังตรงนี้แล้ว
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxJRvqFfUdrDylCm29jw6fDXA2KYUPmMeon1w8qH0mNtWBq5VycPyGUeeKQ4ljR-I8W/exec';
         
         // Room names
         const rooms = [
@@ -585,27 +537,6 @@
             'ห้องประชุม3',
             'ห้องประชุม2'
         ];
-
-        // Check if API URL is set
-        if (API_URL) {
-            document.getElementById('setupNotice').style.display = 'none';
-        }
-
-        // Save API URL
-        function saveApiUrl() {
-            const url = document.getElementById('apiUrlInput').value.trim();
-            if (!url) {
-                alert('กรุณาใส่ URL');
-                return;
-            }
-            
-            localStorage.setItem('googlesheet_api_url', url);
-            API_URL = url;
-            document.getElementById('setupNotice').style.display = 'none';
-            
-            // Reload data
-            loadAllMeetings();
-        }
 
         // API Functions
         async function apiCall(action, data = {}) {
