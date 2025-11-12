@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบบริหารจัดการห้องประชุม ภ.จว.สงขลา (Google Sheets)</title>
+    <title>ระบบบริหารจัดการห้องประชุม | ภ.จว.สงขลา</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -11,939 +12,881 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+        }
+
         body {
-            font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            font-family: 'Prompt', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 0;
+            color: var(--dark);
         }
 
-        .container {
-            max-width: 1600px;
+        /* Navbar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-content {
+            max-width: 1400px;
             margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .header {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            text-align: center;
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
-        .header h1 {
-            color: #1e3c72;
-            font-size: 2.2em;
-            margin-bottom: 5px;
+        .logo-icon {
+            font-size: 2rem;
         }
 
-        .header p {
-            color: #666;
-            font-size: 1.1em;
+        .logo-text h1 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .logo-text p {
+            font-size: 0.875rem;
+            color: #64748b;
         }
 
         .nav-tabs {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            gap: 0.5rem;
         }
 
-        .tab-btn {
-            flex: 1;
-            min-width: 150px;
-            padding: 15px 25px;
-            background: white;
+        .nav-tab {
+            padding: 0.75rem 1.5rem;
             border: none;
-            border-radius: 10px;
+            background: transparent;
+            color: #64748b;
+            font-weight: 500;
             cursor: pointer;
-            font-size: 1.1em;
-            font-weight: bold;
-            color: #666;
+            border-radius: 0.5rem;
             transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            font-family: 'Prompt', sans-serif;
         }
 
-        .tab-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        .nav-tab:hover {
+            background: var(--light);
+            color: var(--primary);
         }
 
-        .tab-btn.active {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        .nav-tab.active {
+            background: var(--primary);
             color: white;
         }
 
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Tab Content */
         .tab-content {
             display: none;
         }
 
         .tab-content.active {
             display: block;
+            animation: fadeIn 0.3s ease-in;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Rooms Grid */
         .rooms-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 1.5rem;
         }
 
+        /* Room Card */
         .room-card {
             background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
         }
 
         .room-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 3px solid #1e3c72;
         }
 
         .room-name {
-            font-size: 1.6em;
-            font-weight: bold;
-            color: #1e3c72;
+            font-size: 1.5rem;
+            font-weight: 600;
         }
 
-        .meeting-count {
-            background: #1e3c72;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.9em;
+        .room-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            backdrop-filter: blur(10px);
         }
 
-        .add-meeting-form {
-            margin-bottom: 20px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
+        .room-body {
+            padding: 1.5rem;
+        }
+
+        /* Form */
+        .form-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 1rem;
         }
 
-        .form-group label {
+        .form-label {
             display: block;
-            margin-bottom: 5px;
-            color: #333;
-            font-weight: bold;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 0.5rem;
         }
 
         .required {
-            color: #ef4444;
+            color: var(--danger);
         }
 
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
+        .form-input,
+        .form-select,
+        .form-textarea {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1em;
-            transition: border-color 0.3s;
-            font-family: inherit;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: 0.5rem;
+            font-family: 'Prompt', sans-serif;
+            font-size: 0.9375rem;
+            transition: all 0.3s;
         }
 
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
             outline: none;
-            border-color: #1e3c72;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
-        .form-group textarea {
+        .form-textarea {
             resize: vertical;
             min-height: 80px;
         }
 
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: bold;
-            transition: all 0.3s;
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
         }
 
-        .btn-add {
-            background: #10b981;
+        /* Button */
+        .btn {
+            padding: 0.875rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-family: 'Prompt', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--primary);
             color: white;
             width: 100%;
         }
 
-        .btn-add:hover {
-            background: #059669;
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
         }
 
-        .btn-add:disabled {
-            background: #9ca3af;
+        .btn-primary:disabled {
+            background: #94a3b8;
             cursor: not-allowed;
+            transform: none;
         }
 
-        .btn-delete {
-            background: #ef4444;
+        .btn-danger {
+            background: var(--danger);
             color: white;
-            padding: 8px 16px;
-            font-size: 0.9em;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
         }
 
-        .btn-delete:hover {
+        .btn-danger:hover {
             background: #dc2626;
         }
 
+        /* Meeting List */
+        .meetings-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
         .meetings-list {
-            max-height: 500px;
+            max-height: 400px;
             overflow-y: auto;
         }
 
-        .meeting-item {
-            background: #f8f9fa;
-            padding: 18px;
-            margin-bottom: 12px;
+        .meetings-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .meetings-list::-webkit-scrollbar-track {
+            background: var(--light);
             border-radius: 10px;
-            border-left: 5px solid #1e3c72;
+        }
+
+        .meetings-list::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .meeting-item {
+            background: var(--light);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s;
+        }
+
+        .meeting-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
         .meeting-header {
             display: flex;
             justify-content: space-between;
             align-items: start;
-            margin-bottom: 10px;
+            margin-bottom: 0.75rem;
         }
 
         .meeting-title {
-            font-weight: bold;
-            color: #1e3c72;
-            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1.0625rem;
             flex: 1;
-            margin-right: 10px;
+            margin-right: 0.5rem;
         }
 
         .meeting-info {
-            margin-bottom: 8px;
+            display: grid;
+            gap: 0.5rem;
         }
 
-        .info-row {
+        .info-item {
             display: flex;
             align-items: center;
-            margin-bottom: 5px;
-            font-size: 0.95em;
-            color: #555;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #475569;
         }
 
         .info-icon {
-            width: 20px;
-            margin-right: 8px;
+            font-size: 1rem;
         }
 
         .meeting-description {
-            font-size: 0.95em;
-            color: #666;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #e0e0e0;
-            line-height: 1.5;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.875rem;
+            color: #64748b;
+            line-height: 1.6;
         }
 
         .empty-state {
             text-align: center;
-            padding: 50px 20px;
-            color: #999;
+            padding: 3rem 1rem;
+            color: #94a3b8;
         }
 
-        .empty-state-icon {
-            font-size: 4em;
-            margin-bottom: 15px;
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
         }
 
-        .summary-container {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .summary-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 3px solid #1e3c72;
-        }
-
-        .summary-title {
-            font-size: 2em;
-            color: #1e3c72;
-            font-weight: bold;
-        }
-
-        .day-section {
-            margin-bottom: 30px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-        }
-
-        .day-header {
-            font-size: 1.5em;
-            color: #1e3c72;
-            font-weight: bold;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #1e3c72;
-        }
-
-        .day-stats {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 15px;
-            font-size: 0.95em;
-            color: #666;
-        }
-
-        .summary-meeting-item {
-            background: white;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            border-left: 4px solid #1e3c72;
-        }
-
-        .summary-meeting-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 8px;
-        }
-
-        .summary-meeting-title {
-            font-weight: bold;
-            color: #1e3c72;
-            font-size: 1.1em;
-        }
-
-        .summary-room-badge {
-            background: #1e3c72;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 15px;
-            font-size: 0.85em;
-            white-space: nowrap;
-        }
-
+        /* Alert */
         .alert {
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            font-weight: bold;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9375rem;
+            animation: slideDown 0.3s ease;
         }
 
-        .alert-error {
-            background: #fee2e2;
-            color: #991b1b;
-            border-left: 4px solid #ef4444;
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .alert-success {
             background: #d1fae5;
             color: #065f46;
-            border-left: 4px solid #10b981;
+            border-left: 4px solid var(--success);
         }
 
-        .modal-overlay {
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid var(--danger);
+        }
+
+        /* Modal */
+        .modal {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 9999;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
             align-items: center;
             justify-content: center;
         }
 
-        .modal-overlay.active {
+        .modal.active {
             display: flex;
         }
 
         .modal-content {
             background: white;
-            padding: 30px;
-            border-radius: 15px;
+            border-radius: 1rem;
+            padding: 2rem;
             max-width: 500px;
             width: 90%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            animation: modalSlideIn 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalZoom 0.3s ease;
         }
 
-        @keyframes modalSlideIn {
-            from {
-                transform: translateY(-50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+        @keyframes modalZoom {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .modal-header {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #ef4444;
-            margin-bottom: 15px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--danger);
+            margin-bottom: 1rem;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 0.75rem;
         }
 
         .modal-body {
-            font-size: 1.1em;
-            color: #333;
-            margin-bottom: 25px;
+            color: #475569;
+            margin-bottom: 1.5rem;
             line-height: 1.6;
         }
 
         .modal-footer {
             display: flex;
-            gap: 10px;
+            gap: 0.75rem;
             justify-content: flex-end;
         }
 
-        .btn-cancel {
-            background: #6b7280;
+        .btn-secondary {
+            background: #e2e8f0;
+            color: var(--dark);
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        /* Summary Page */
+        .summary-container {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .summary-header h2 {
+            font-size: 2rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-header p {
+            color: #64748b;
+        }
+
+        .week-section {
+            margin-bottom: 2rem;
+            background: var(--light);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+
+        .week-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .week-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .week-count {
+            background: var(--primary);
             color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: bold;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
         }
 
-        .btn-cancel:hover {
-            background: #4b5563;
+        .day-group {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
         }
 
-        .btn-confirm-delete {
-            background: #ef4444;
+        .day-title {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.75rem;
+            font-size: 1.0625rem;
+        }
+
+        .summary-meeting {
+            background: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .summary-meeting-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-meeting-title {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .summary-room-badge {
+            background: var(--primary);
             color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: bold;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
         }
 
-        .btn-confirm-delete:hover {
-            background: #dc2626;
-        }
-
+        /* Loading */
         .loading {
             text-align: center;
-            padding: 40px;
-            color: #666;
+            padding: 3rem;
         }
 
         .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #1e3c72;
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            margin: 0 auto 1rem;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
         }
 
+        /* Responsive */
         @media (max-width: 768px) {
-            .header h1 {
-                font-size: 1.6em;
+            .navbar {
+                padding: 1rem;
+            }
+
+            .navbar-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .logo-text h1 {
+                font-size: 1.25rem;
+            }
+
+            .nav-tabs {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .container {
+                padding: 0 1rem;
             }
 
             .rooms-grid {
                 grid-template-columns: 1fr;
             }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                margin: 1rem;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <div class="logo">
+                <div class="logo-icon">🏛️</div>
+                <div class="logo-text">
+                    <h1>ระบบบริหารจัดการห้องประชุม</h1>
+                    <p>สำนักงานตำรวจภูธรจังหวัดสงขลา</p>
+                </div>
+            </div>
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-tab="booking">📅 จองห้องประชุม</button>
+                <button class="nav-tab" data-tab="summary">📊 สรุปรายสัปดาห์</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Container -->
     <div class="container">
-        <div class="header">
-            <h1>🏛️ ระบบบริหารจัดการห้องประชุม</h1>
-            <p>สำนักงานตำรวจภูธรจังหวัดสงขลา (Google Sheets Version)</p>
-        </div>
-
-        <div class="nav-tabs">
-            <button class="tab-btn active" id="tab-booking">📅 จองห้องประชุม</button>
-            <button class="tab-btn" id="tab-summary">📊 สรุปการประชุมรายสัปดาห์</button>
-        </div>
-
+        <!-- Booking Tab -->
         <div id="booking-tab" class="tab-content active">
             <div class="rooms-grid" id="roomsGrid"></div>
         </div>
 
+        <!-- Summary Tab -->
         <div id="summary-tab" class="tab-content">
             <div class="summary-container">
                 <div class="summary-header">
-                    <div class="summary-title">สรุปการประชุมรายสัปดาห์</div>
+                    <h2>📊 สรุปการประชุมรายสัปดาห์</h2>
+                    <p>ภาพรวมการใช้งานห้องประชุมทั้งหมด</p>
                 </div>
                 <div id="summaryContent"></div>
             </div>
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div class="modal-overlay" id="deleteModal">
+    <!-- Delete Modal -->
+    <div class="modal" id="deleteModal">
         <div class="modal-content">
             <div class="modal-header">
-                ⚠️ ยืนยันการลบ
+                <span>⚠️</span> ยืนยันการลบ
             </div>
             <div class="modal-body">
-                คุณต้องการลบรายการประชุมนี้หรือไม่?
+                คุณต้องการลบรายการประชุมนี้หรือไม่?<br>
+                การดำเนินการนี้ไม่สามารถย้อนกลับได้
             </div>
             <div class="modal-footer">
-                <button class="btn-cancel" id="btnCancelDelete">ยกเลิก</button>
-                <button class="btn-confirm-delete" id="btnConfirmDelete">ลบ</button>
+                <button class="btn btn-secondary" id="btnCancel">ยกเลิก</button>
+                <button class="btn btn-danger" id="btnConfirm">ลบรายการ</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Configuration - API URL ฝังตรงนี้แล้ว
+        // ==========================================
+        // CONFIGURATION
+        // ==========================================
+        
         const API_URL = 'https://script.google.com/macros/s/AKfycbxJRvqFfUdrDylCm29jw6fDXA2KYUPmMeon1w8qH0mNtWBq5VycPyGUeeKQ4ljR-I8W/exec';
         
-        // Room names
-        const rooms = [
+        const ROOMS = [
             'ห้องประชุมสมิหลา',
             'ห้องประชุม204',
             'ห้องประชุม3',
             'ห้องประชุม2'
         ];
 
-        // API Functions
-        async function apiCall(action, data = {}) {
-            if (!API_URL) {
-                throw new Error('กรุณาตั้งค่า API URL ก่อน');
-            }
+        // ==========================================
+        // DATA MANAGEMENT
+        // ==========================================
+        
+        let meetingsData = {};
+        
+        // Initialize data structure
+        ROOMS.forEach(room => meetingsData[room] = []);
 
+        // Load all meetings from server
+        async function loadMeetings() {
             try {
-                if (action === 'getAllMeetings') {
-                    // Use GET for reading data
-                    const response = await fetch(`${API_URL}?action=getAllMeetings`);
-                    const result = await response.json();
-                    
-                    if (!result.success) {
-                        throw new Error(result.message || 'เกิดข้อผิดพลาด');
-                    }
-                    
-                    return result.data;
-                } else {
-                    // Use POST for write operations
-                    const payload = { action, ...data };
-                    
-                    const response = await fetch(API_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(payload),
-                        redirect: 'follow'
-                    });
-
-                    const result = await response.json();
-                    
-                    if (!result.success) {
-                        throw new Error(result.message || 'เกิดข้อผิดพลาด');
-                    }
-                    
-                    return result.data;
-                }
-            } catch (error) {
-                console.error('API Error:', error);
-                throw error;
-            }
-        }
-
-        // Database Manager Class
-        class MeetingDatabase {
-            constructor() {
-                this.data = {};
-                rooms.forEach(room => {
-                    this.data[room] = [];
-                });
-            }
-
-            async loadFromServer() {
-                try {
-                    const meetings = await apiCall('getAllMeetings');
-                    
-                    // Clear current data
-                    rooms.forEach(room => {
-                        this.data[room] = [];
-                    });
-                    
+                const url = `${API_URL}?action=getAllMeetings&_=${Date.now()}`;
+                const response = await fetch(url);
+                const result = await response.json();
+                
+                if (result.success) {
                     // Organize by room
-                    if (Array.isArray(meetings)) {
-                        meetings.forEach(meeting => {
-                            if (this.data[meeting.room]) {
-                                this.data[meeting.room].push(meeting);
+                    ROOMS.forEach(room => meetingsData[room] = []);
+                    
+                    if (Array.isArray(result.data)) {
+                        result.data.forEach(meeting => {
+                            if (meetingsData[meeting.room]) {
+                                meetingsData[meeting.room].push(meeting);
                             }
                         });
                     }
                     
-                    console.log('Data loaded from server:', this.data);
                     return true;
-                } catch (error) {
-                    console.error('Load error:', error);
-                    alert('ไม่สามารถโหลดข้อมูลได้: ' + error.message);
-                    return false;
                 }
+                
+                throw new Error(result.message || 'ไม่สามารถโหลดข้อมูลได้');
+            } catch (error) {
+                console.error('Load error:', error);
+                return false;
             }
+        }
 
-            async addMeeting(roomName, meeting) {
-                try {
-                    await apiCall('addMeeting', {
+        // Add meeting
+        async function addMeeting(roomName, data) {
+            try {
+                const params = new URLSearchParams({
+                    action: 'addMeeting',
+                    data: JSON.stringify({
                         room: roomName,
-                        title: meeting.title,
-                        chairman: meeting.chairman,
-                        date: meeting.date,
-                        timeStart: meeting.timeStart,
-                        description: meeting.description
-                    });
-                    
-                    // Reload data
-                    await this.loadFromServer();
-                    return true;
-                } catch (error) {
-                    console.error('Add meeting error:', error);
-                    throw error;
-                }
-            }
-
-            async deleteMeeting(roomName, meetingId) {
-                try {
-                    await apiCall('deleteMeeting', {
-                        id: meetingId,
-                        room: roomName
-                    });
-                    
-                    // Reload data
-                    await this.loadFromServer();
-                    return true;
-                } catch (error) {
-                    console.error('Delete meeting error:', error);
-                    throw error;
-                }
-            }
-
-            getMeetings(roomName) {
-                return this.data[roomName] || [];
-            }
-
-            getAllMeetings() {
-                const all = [];
-                Object.keys(this.data).forEach(room => {
-                    this.data[room].forEach(meeting => {
-                        all.push({ ...meeting, room: room });
-                    });
+                        title: data.title,
+                        chairman: data.chairman,
+                        date: data.date,
+                        timeStart: data.timeStart,
+                        description: data.description
+                    }),
+                    _: Date.now()
                 });
-                return all;
-            }
-
-            checkOverlap(roomName, date, timeStart) {
-                const meetings = this.getMeetings(roomName);
                 
-                for (let meeting of meetings) {
-                    if (meeting.date === date && meeting.timeStart === timeStart) {
-                        return { overlap: true, meeting: meeting };
-                    }
+                const response = await fetch(`${API_URL}?${params.toString()}`);
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.message);
                 }
                 
-                return { overlap: false };
+                await loadMeetings();
+                return true;
+            } catch (error) {
+                throw error;
             }
         }
 
-        // Initialize database
-        const db = new MeetingDatabase();
-
-        // UI Manager
-        class UIManager {
-            static showAlert(roomName, message, type) {
-                const alertDiv = document.getElementById(`alert-${roomName}`);
-                if (!alertDiv) return;
+        // Delete meeting
+        async function deleteMeeting(roomName, meetingId) {
+            try {
+                const params = new URLSearchParams({
+                    action: 'deleteMeeting',
+                    data: JSON.stringify({
+                        room: roomName,
+                        id: meetingId
+                    }),
+                    _: Date.now()
+                });
                 
-                const alertClass = type === 'error' ? 'alert-error' : 'alert-success';
-                alertDiv.innerHTML = `<div class="alert ${alertClass}">${message.replace(/\n/g, '<br>')}</div>`;
-            }
-
-            static clearAlert(roomName) {
-                const alertDiv = document.getElementById(`alert-${roomName}`);
-                if (alertDiv) {
-                    alertDiv.innerHTML = '';
-                }
-            }
-
-            static formatDate(dateStr) {
-                const date = new Date(dateStr);
-                const thaiDays = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
-                const thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 
-                                   'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+                const response = await fetch(`${API_URL}?${params.toString()}`);
+                const result = await response.json();
                 
-                return `วัน${thaiDays[date.getDay()]}ที่ ${date.getDate()} ${thaiMonths[date.getMonth()]} ${date.getFullYear() + 543}`;
-            }
-
-            static formatShortDate(dateStr) {
-                const date = new Date(dateStr);
-                const thaiMonths = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 
-                                   'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
-                return `${date.getDate()} ${thaiMonths[date.getMonth()]} ${date.getFullYear() + 543}`;
-            }
-
-            static showLoading(elementId) {
-                const element = document.getElementById(elementId);
-                if (element) {
-                    element.innerHTML = `
-                        <div class="loading">
-                            <div class="spinner"></div>
-                            <div>กำลังโหลดข้อมูล...</div>
-                        </div>
-                    `;
+                if (!result.success) {
+                    throw new Error(result.message);
                 }
+                
+                await loadMeetings();
+                return true;
+            } catch (error) {
+                throw error;
             }
         }
 
-        // Meeting Manager
-        class MeetingManager {
-            static async addMeeting(roomName) {
-                const title = document.getElementById(`title-${roomName}`).value.trim();
-                const chairman = document.getElementById(`chairman-${roomName}`).value.trim();
-                const date = document.getElementById(`date-${roomName}`).value;
-                const timeHour = document.getElementById(`time-hour-${roomName}`).value;
-                const timeMinute = document.getElementById(`time-minute-${roomName}`).value;
-                const description = document.getElementById(`desc-${roomName}`).value.trim();
-
-                if (!title || !chairman || !date || !timeHour || !timeMinute) {
-                    UIManager.showAlert(roomName, 'กรุณากรอกข้อมูลให้ครบถ้วน (ทุกช่องที่มีเครื่องหมาย *)', 'error');
-                    return;
-                }
-
-                const timeStart = `${timeHour}:${timeMinute}`;
-
-                const overlapCheck = db.checkOverlap(roomName, date, timeStart);
-                if (overlapCheck.overlap) {
-                    const om = overlapCheck.meeting;
-                    UIManager.showAlert(
-                        roomName, 
-                        `⚠️ ห้องประชุมนี้ถูกจองแล้ว!\n\nการประชุม: "${om.title}"\nเวลา: ${om.timeStart} น.\n\nกรุณาเลือกเวลาอื่น`, 
-                        'error'
-                    );
-                    return;
-                }
-
-                const meeting = {
-                    title,
-                    chairman,
-                    date,
-                    timeStart,
-                    description
-                };
-
-                // Disable button
-                const btn = document.querySelector(`[data-room-name="${roomName}"]`);
-                btn.disabled = true;
-                btn.textContent = 'กำลังบันทึก...';
-
-                try {
-                    await db.addMeeting(roomName, meeting);
-
-                    // Clear form
-                    document.getElementById(`title-${roomName}`).value = '';
-                    document.getElementById(`chairman-${roomName}`).value = '';
-                    document.getElementById(`date-${roomName}`).value = '';
-                    document.getElementById(`time-hour-${roomName}`).value = '';
-                    document.getElementById(`time-minute-${roomName}`).value = '';
-                    document.getElementById(`desc-${roomName}`).value = '';
-
-                    UIManager.showAlert(roomName, '✅ เพิ่มรายการประชุมสำเร็จ', 'success');
-                    setTimeout(() => UIManager.clearAlert(roomName), 3000);
-
-                    RoomRenderer.renderRoom(roomName);
-                    SummaryRenderer.render();
-                } catch (error) {
-                    UIManager.showAlert(roomName, '❌ เกิดข้อผิดพลาด: ' + error.message, 'error');
-                } finally {
-                    btn.disabled = false;
-                    btn.textContent = '➕ เพิ่มรายการประชุม';
+        // Check overlap
+        function checkOverlap(roomName, date, time, excludeId = null) {
+            const meetings = meetingsData[roomName] || [];
+            
+            for (let meeting of meetings) {
+                if (excludeId && meeting.id === excludeId) continue;
+                if (meeting.date === date && meeting.timeStart === time) {
+                    return meeting;
                 }
             }
-
-            static async deleteMeeting(roomName, meetingId) {
-                const modal = document.getElementById('deleteModal');
-                const btnConfirm = document.getElementById('btnConfirmDelete');
-                const btnCancel = document.getElementById('btnCancelDelete');
-                
-                modal.classList.add('active');
-                
-                const newBtnConfirm = btnConfirm.cloneNode(true);
-                btnConfirm.parentNode.replaceChild(newBtnConfirm, btnConfirm);
-                
-                const newBtnCancel = btnCancel.cloneNode(true);
-                btnCancel.parentNode.replaceChild(newBtnCancel, btnCancel);
-                
-                document.getElementById('btnConfirmDelete').addEventListener('click', async () => {
-                    modal.classList.remove('active');
-                    
-                    try {
-                        await db.deleteMeeting(roomName, meetingId);
-                        
-                        RoomRenderer.renderRoom(roomName);
-                        SummaryRenderer.render();
-                        UIManager.showAlert(roomName, '✅ ลบรายการประชุมสำเร็จ', 'success');
-                        setTimeout(() => UIManager.clearAlert(roomName), 3000);
-                    } catch (error) {
-                        UIManager.showAlert(roomName, '❌ เกิดข้อผิดพลาด: ' + error.message, 'error');
-                    }
-                });
-                
-                document.getElementById('btnCancelDelete').addEventListener('click', () => {
-                    modal.classList.remove('active');
-                });
-                
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) {
-                        modal.classList.remove('active');
-                    }
-                });
-            }
+            
+            return null;
         }
 
-        // Room Renderer
-        class RoomRenderer {
-            static renderRoom(roomName) {
-                const roomCard = document.querySelector(`[data-room="${roomName}"]`);
-                if (!roomCard) return;
-                
-                const meetingsList = roomCard.querySelector('.meetings-list');
-                const countBadge = roomCard.querySelector('.meeting-count');
-                
-                const roomMeetings = db.getMeetings(roomName);
-                countBadge.textContent = `${roomMeetings.length} รายการ`;
+        // ==========================================
+        // UI HELPERS
+        // ==========================================
+        
+        function showAlert(roomName, message, type = 'success') {
+            const alertDiv = document.getElementById(`alert-${roomName}`);
+            const icon = type === 'success' ? '✅' : '❌';
+            const className = type === 'success' ? 'alert-success' : 'alert-error';
+            
+            alertDiv.innerHTML = `
+                <div class="alert ${className}">
+                    <span>${icon}</span>
+                    <span>${message}</span>
+                </div>
+            `;
+        }
 
-                if (roomMeetings.length === 0) {
-                    meetingsList.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-state-icon">📅</div>
-                            <div>ยังไม่มีรายการประชุม</div>
-                        </div>
-                    `;
-                    return;
-                }
+        function clearAlert(roomName) {
+            const alertDiv = document.getElementById(`alert-${roomName}`);
+            alertDiv.innerHTML = '';
+        }
 
-                roomMeetings.sort((a, b) => {
-                    const dateTimeA = new Date(a.date + ' ' + a.timeStart);
-                    const dateTimeB = new Date(b.date + ' ' + b.timeStart);
-                    return dateTimeA - dateTimeB;
-                });
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const days = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
+            const months = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+                           'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+            
+            return `วัน${days[date.getDay()]}ที่ ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear() + 543}`;
+        }
 
-                meetingsList.innerHTML = roomMeetings.map(meeting => `
-                    <div class="meeting-item">
-                        <div class="meeting-header">
-                            <div class="meeting-title">${meeting.title}</div>
-                            <button class="btn btn-delete delete-meeting-btn" data-room-name="${roomName}" data-meeting-id="${meeting.id}">
-                                🗑️ ลบ
-                            </button>
-                        </div>
-                        <div class="meeting-info">
-                            <div class="info-row">
-                                <span class="info-icon">👤</span>
-                                <strong>ประธาน:</strong> ${meeting.chairman}
-                            </div>
-                            <div class="info-row">
-                                <span class="info-icon">📅</span>
-                                <strong>วันที่:</strong> ${UIManager.formatShortDate(meeting.date)}
-                            </div>
-                            <div class="info-row">
-                                <span class="info-icon">🕐</span>
-                                <strong>เวลา:</strong> ${meeting.timeStart} น.
-                            </div>
-                        </div>
-                        ${meeting.description ? `
-                            <div class="meeting-description">
-                                <strong>รายละเอียด:</strong><br>
-                                ${meeting.description}
-                            </div>
-                        ` : ''}
+        function formatShortDate(dateStr) {
+            const date = new Date(dateStr);
+            const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
+                           'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+            return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear() + 543}`;
+        }
+
+        // ==========================================
+        // RENDER FUNCTIONS
+        // ==========================================
+        
+        function renderRooms() {
+            const grid = document.getElementById('roomsGrid');
+            
+            grid.innerHTML = ROOMS.map(room => `
+                <div class="room-card">
+                    <div class="room-header">
+                        <div class="room-name">${room}</div>
+                        <div class="room-badge" id="count-${room}">0 รายการ</div>
                     </div>
-                `).join('');
-
-                meetingsList.querySelectorAll('.delete-meeting-btn').forEach(btn => {
-                    btn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const roomName = this.getAttribute('data-room-name');
-                        const meetingId = parseInt(this.getAttribute('data-meeting-id'));
-                        MeetingManager.deleteMeeting(roomName, meetingId);
-                    });
-                });
-            }
-
-            static renderAll() {
-                const roomsGrid = document.getElementById('roomsGrid');
-                
-                roomsGrid.innerHTML = rooms.map(room => `
-                    <div class="room-card" data-room="${room}">
-                        <div class="room-header">
-                            <div class="room-name">${room}</div>
-                            <div class="meeting-count">0 รายการ</div>
-                        </div>
-                        
+                    <div class="room-body">
                         <div id="alert-${room}"></div>
                         
-                        <div class="add-meeting-form">
-                            <div class="form-group">
-                                <label>หัวข้อการประชุม <span class="required">*</span></label>
-                                <input type="text" id="title-${room}" placeholder="ระบุหัวข้อการประชุม">
+                        <div class="form-section">
+                            <div class="form-title">
+                                <span>➕</span> เพิ่มการประชุมใหม่
                             </div>
                             
                             <div class="form-group">
-                                <label>ประธานในการประชุม <span class="required">*</span></label>
-                                <input type="text" id="chairman-${room}" placeholder="ชื่อ-สกุล หรือ ตำแหน่ง">
+                                <label class="form-label">หัวข้อการประชุม <span class="required">*</span></label>
+                                <input type="text" class="form-input" id="title-${room}" placeholder="ระบุหัวข้อการประชุม">
                             </div>
                             
                             <div class="form-group">
-                                <label>วันที่ <span class="required">*</span></label>
-                                <input type="date" id="date-${room}">
+                                <label class="form-label">ประธานในการประชุม <span class="required">*</span></label>
+                                <input type="text" class="form-input" id="chairman-${room}" placeholder="ชื่อ-สกุล หรือตำแหน่ง">
                             </div>
                             
                             <div class="form-group">
-                                <label>เวลา <span class="required">*</span></label>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                    <select id="time-hour-${room}">
-                                        <option value="">ชั่วโมง</option>
+                                <label class="form-label">วันที่ <span class="required">*</span></label>
+                                <input type="date" class="form-input" id="date-${room}">
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">ชั่วโมง <span class="required">*</span></label>
+                                    <select class="form-select" id="hour-${room}">
+                                        <option value="">เลือก</option>
                                         ${Array.from({length: 24}, (_, i) => {
                                             const h = i.toString().padStart(2, '0');
                                             return `<option value="${h}">${h}</option>`;
                                         }).join('')}
                                     </select>
-                                    <select id="time-minute-${room}">
-                                        <option value="">นาที</option>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">นาที <span class="required">*</span></label>
+                                    <select class="form-select" id="minute-${room}">
+                                        <option value="">เลือก</option>
                                         <option value="00">00</option>
                                         <option value="30">30</option>
                                     </select>
@@ -951,225 +894,383 @@
                             </div>
                             
                             <div class="form-group">
-                                <label>รายละเอียดการประชุม</label>
-                                <textarea id="desc-${room}" placeholder="วาระการประชุม, ผู้เข้าร่วม, หมายเหตุ"></textarea>
+                                <label class="form-label">รายละเอียด</label>
+                                <textarea class="form-textarea" id="desc-${room}" placeholder="วาระการประชุม, ผู้เข้าร่วม, หมายเหตุ"></textarea>
                             </div>
                             
-                            <button class="btn btn-add add-meeting-btn" data-room-name="${room}">
-                                ➕ เพิ่มรายการประชุม
+                            <button class="btn btn-primary" data-room="${room}">
+                                <span>➕</span> เพิ่มรายการประชุม
                             </button>
                         </div>
                         
-                        <div class="meetings-list"></div>
-                    </div>
-                `).join('');
-
-                roomsGrid.querySelectorAll('.add-meeting-btn').forEach(btn => {
-                    btn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const roomName = this.getAttribute('data-room-name');
-                        MeetingManager.addMeeting(roomName);
-                    });
-                });
-
-                rooms.forEach(room => this.renderRoom(room));
-            }
-        }
-
-        // Summary Renderer (same as before)
-        class SummaryRenderer {
-            static getWeekNumber(date) {
-                const d = new Date(date);
-                d.setHours(0, 0, 0, 0);
-                d.setDate(d.getDate() + 4 - (d.getDay() || 7));
-                const yearStart = new Date(d.getFullYear(), 0, 1);
-                const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-                return { year: d.getFullYear(), week: weekNo };
-            }
-
-            static getWeekDateRange(year, week) {
-                const simple = new Date(year, 0, 1 + (week - 1) * 7);
-                const dow = simple.getDay();
-                const ISOweekStart = simple;
-                if (dow <= 4)
-                    ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
-                else
-                    ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
-                
-                const weekEnd = new Date(ISOweekStart);
-                weekEnd.setDate(ISOweekStart.getDate() + 6);
-                
-                return { start: ISOweekStart, end: weekEnd };
-            }
-
-            static formatWeekRange(startDate, endDate) {
-                const thaiMonths = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 
-                                   'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
-                
-                const startDay = startDate.getDate();
-                const startMonth = thaiMonths[startDate.getMonth()];
-                const startYear = startDate.getFullYear() + 543;
-                
-                const endDay = endDate.getDate();
-                const endMonth = thaiMonths[endDate.getMonth()];
-                const endYear = endDate.getFullYear() + 543;
-                
-                if (startMonth === endMonth && startYear === endYear) {
-                    return `${startDay}-${endDay} ${startMonth} ${startYear}`;
-                } else if (startYear === endYear) {
-                    return `${startDay} ${startMonth} - ${endDay} ${endMonth} ${startYear}`;
-                } else {
-                    return `${startDay} ${startMonth} ${startYear} - ${endDay} ${endMonth} ${endYear}`;
-                }
-            }
-
-            static render() {
-                const summaryContent = document.getElementById('summaryContent');
-                
-                let allMeetings = db.getAllMeetings();
-
-                if (allMeetings.length === 0) {
-                    summaryContent.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-state-icon">📋</div>
-                            <div>ไม่มีรายการประชุม</div>
+                        <div class="meetings-section">
+                            <div class="section-title">
+                                <span>📋</span> รายการประชุม
+                            </div>
+                            <div class="meetings-list" id="list-${room}"></div>
                         </div>
-                    `;
-                    return;
-                }
-
-                allMeetings.sort((a, b) => {
-                    const dateTimeA = new Date(a.date + ' ' + a.timeStart);
-                    const dateTimeB = new Date(b.date + ' ' + b.timeStart);
-                    return dateTimeA - dateTimeB;
-                });
-
-                const groupedByWeek = {};
-                allMeetings.forEach(meeting => {
-                    const weekInfo = this.getWeekNumber(meeting.date);
-                    const weekKey = `${weekInfo.year}-W${weekInfo.week}`;
-                    
-                    if (!groupedByWeek[weekKey]) {
-                        groupedByWeek[weekKey] = {
-                            year: weekInfo.year,
-                            week: weekInfo.week,
-                            meetings: []
-                        };
-                    }
-                    groupedByWeek[weekKey].meetings.push(meeting);
-                });
-
-                const sortedWeeks = Object.keys(groupedByWeek).sort().reverse();
-
-                let html = '';
-                sortedWeeks.forEach(weekKey => {
-                    const weekData = groupedByWeek[weekKey];
-                    const weekRange = this.getWeekDateRange(weekData.year, weekData.week);
-                    const weekRangeText = this.formatWeekRange(weekRange.start, weekRange.end);
-
-                    html += `
-                        <div class="day-section">
-                            <div class="day-header">
-                                สัปดาห์ที่ ${weekData.week} (${weekRangeText})
-                            </div>
-                            <div class="day-stats">
-                                <span>📊 จำนวนการประชุม: <strong>${weekData.meetings.length}</strong> รายการ</span>
-                            </div>
-                    `;
-
-                    const meetingsByDate = {};
-                    weekData.meetings.forEach(meeting => {
-                        if (!meetingsByDate[meeting.date]) {
-                            meetingsByDate[meeting.date] = [];
-                        }
-                        meetingsByDate[meeting.date].push(meeting);
-                    });
-
-                    Object.keys(meetingsByDate).sort().forEach(date => {
-                        const dayMeetings = meetingsByDate[date];
-                        html += `
-                            <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #e0e0e0;">
-                                <div style="font-weight: bold; color: #1e3c72; margin-bottom: 10px;">
-                                    ${UIManager.formatDate(date)}
-                                </div>
-                        `;
-                        
-                        dayMeetings.forEach(meeting => {
-                            html += `
-                                <div class="summary-meeting-item">
-                                    <div class="summary-meeting-header">
-                                        <div class="summary-meeting-title">${meeting.title}</div>
-                                        <div class="summary-room-badge">${meeting.room}</div>
-                                    </div>
-                                    <div class="info-row">
-                                        <span class="info-icon">🕐</span>
-                                        <strong>เวลา:</strong> ${meeting.timeStart} น.
-                                    </div>
-                                    <div class="info-row">
-                                        <span class="info-icon">👤</span>
-                                        <strong>ประธาน:</strong> ${meeting.chairman}
-                                    </div>
-                                    ${meeting.description ? `
-                                        <div class="meeting-description">
-                                            <strong>รายละเอียด:</strong><br>${meeting.description}
-                                        </div>
-                                    ` : ''}
-                                </div>
-                            `;
-                        });
-
-                        html += `</div>`;
-                    });
-
-                    html += `</div>`;
-                });
-
-                summaryContent.innerHTML = html;
-            }
+                    </div>
+                </div>
+            `).join('');
+            
+            // Add event listeners
+            grid.querySelectorAll('.btn-primary').forEach(btn => {
+                btn.addEventListener('click', handleAddMeeting);
+            });
+            
+            renderAllMeetings();
         }
 
-        // Tab switching
-        document.getElementById('tab-booking').addEventListener('click', () => {
-            document.getElementById('tab-booking').classList.add('active');
-            document.getElementById('tab-summary').classList.remove('active');
-            document.getElementById('booking-tab').classList.add('active');
-            document.getElementById('summary-tab').classList.remove('active');
-        });
-
-        document.getElementById('tab-summary').addEventListener('click', () => {
-            document.getElementById('tab-summary').classList.add('active');
-            document.getElementById('tab-booking').classList.remove('active');
-            document.getElementById('summary-tab').classList.add('active');
-            document.getElementById('booking-tab').classList.remove('active');
-            SummaryRenderer.render();
-        });
-
-        // Initialize and load data
-        async function loadAllMeetings() {
-            if (!API_URL) {
-                console.log('API URL not set');
+        function renderMeetings(roomName) {
+            const list = document.getElementById(`list-${roomName}`);
+            const count = document.getElementById(`count-${roomName}`);
+            const meetings = meetingsData[roomName] || [];
+            
+            count.textContent = `${meetings.length} รายการ`;
+            
+            if (meetings.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📅</div>
+                        <div>ยังไม่มีรายการประชุม</div>
+                    </div>
+                `;
                 return;
             }
-
-            UIManager.showLoading('roomsGrid');
             
-            const success = await db.loadFromServer();
+            // Sort by date and time
+            meetings.sort((a, b) => {
+                const dateA = new Date(a.date + ' ' + a.timeStart);
+                const dateB = new Date(b.date + ' ' + b.timeStart);
+                return dateA - dateB;
+            });
+            
+            list.innerHTML = meetings.map(m => `
+                <div class="meeting-item">
+                    <div class="meeting-header">
+                        <div class="meeting-title">${m.title}</div>
+                        <button class="btn btn-danger" data-room="${roomName}" data-id="${m.id}">
+                            🗑️ ลบ
+                        </button>
+                    </div>
+                    <div class="meeting-info">
+                        <div class="info-item">
+                            <span class="info-icon">👤</span>
+                            <span><strong>ประธาน:</strong> ${m.chairman}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-icon">📅</span>
+                            <span><strong>วันที่:</strong> ${formatShortDate(m.date)}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-icon">🕐</span>
+                            <span><strong>เวลา:</strong> ${m.timeStart} น.</span>
+                        </div>
+                    </div>
+                    ${m.description ? `
+                        <div class="meeting-description">
+                            <strong>รายละเอียด:</strong> ${m.description}
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+            
+            // Add delete listeners
+            list.querySelectorAll('.btn-danger').forEach(btn => {
+                btn.addEventListener('click', handleDeleteMeeting);
+            });
+        }
+
+        function renderAllMeetings() {
+            ROOMS.forEach(room => renderMeetings(room));
+        }
+
+        function renderSummary() {
+            const container = document.getElementById('summaryContent');
+            
+            // Collect all meetings
+            let allMeetings = [];
+            ROOMS.forEach(room => {
+                meetingsData[room].forEach(m => {
+                    allMeetings.push({...m, room});
+                });
+            });
+            
+            if (allMeetings.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <div>ยังไม่มีรายการประชุม</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Sort by date
+            allMeetings.sort((a, b) => {
+                const dateA = new Date(a.date + ' ' + a.timeStart);
+                const dateB = new Date(b.date + ' ' + b.timeStart);
+                return dateA - dateB;
+            });
+            
+            // Group by week
+            const weeks = {};
+            allMeetings.forEach(m => {
+                const date = new Date(m.date);
+                const week = getWeekNumber(date);
+                const key = `${week.year}-W${week.week}`;
+                
+                if (!weeks[key]) {
+                    weeks[key] = {
+                        year: week.year,
+                        week: week.week,
+                        meetings: []
+                    };
+                }
+                weeks[key].meetings.push(m);
+            });
+            
+            // Render weeks
+            const sortedWeeks = Object.keys(weeks).sort().reverse();
+            
+            container.innerHTML = sortedWeeks.map(key => {
+                const w = weeks[key];
+                const range = getWeekRange(w.year, w.week);
+                
+                // Group by date
+                const byDate = {};
+                w.meetings.forEach(m => {
+                    if (!byDate[m.date]) byDate[m.date] = [];
+                    byDate[m.date].push(m);
+                });
+                
+                return `
+                    <div class="week-section">
+                        <div class="week-header">
+                            <div class="week-title">สัปดาห์ที่ ${w.week} (${range})</div>
+                            <div class="week-count">${w.meetings.length} รายการ</div>
+                        </div>
+                        ${Object.keys(byDate).sort().map(date => `
+                            <div class="day-group">
+                                <div class="day-title">${formatDate(date)}</div>
+                                ${byDate[date].map(m => `
+                                    <div class="summary-meeting">
+                                        <div class="summary-meeting-header">
+                                            <div class="summary-meeting-title">${m.title}</div>
+                                            <div class="summary-room-badge">${m.room}</div>
+                                        </div>
+                                        <div class="meeting-info">
+                                            <div class="info-item">
+                                                <span class="info-icon">🕐</span>
+                                                <span>${m.timeStart} น.</span>
+                                            </div>
+                                            <div class="info-item">
+                                                <span class="info-icon">👤</span>
+                                                <span>${m.chairman}</span>
+                                            </div>
+                                        </div>
+                                        ${m.description ? `
+                                            <div class="meeting-description">
+                                                ${m.description}
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ==========================================
+        // EVENT HANDLERS
+        // ==========================================
+        
+        async function handleAddMeeting(e) {
+            const btn = e.currentTarget;
+            const room = btn.dataset.room;
+            
+            const title = document.getElementById(`title-${room}`).value.trim();
+            const chairman = document.getElementById(`chairman-${room}`).value.trim();
+            const date = document.getElementById(`date-${room}`).value;
+            const hour = document.getElementById(`hour-${room}`).value;
+            const minute = document.getElementById(`minute-${room}`).value;
+            const description = document.getElementById(`desc-${room}`).value.trim();
+            
+            // Validate
+            if (!title || !chairman || !date || !hour || !minute) {
+                showAlert(room, 'กรุณากรอกข้อมูลให้ครบถ้วน', 'error');
+                return;
+            }
+            
+            const time = `${hour}:${minute}`;
+            
+            // Check overlap
+            const overlap = checkOverlap(room, date, time);
+            if (overlap) {
+                showAlert(room, `ห้องนี้ถูกจองแล้วในเวลา ${time} น. (${overlap.title})`, 'error');
+                return;
+            }
+            
+            // Show loading
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳</span> กำลังบันทึก...';
+            
+            try {
+                await addMeeting(room, {
+                    title,
+                    chairman,
+                    date,
+                    timeStart: time,
+                    description
+                });
+                
+                // Clear form
+                document.getElementById(`title-${room}`).value = '';
+                document.getElementById(`chairman-${room}`).value = '';
+                document.getElementById(`date-${room}`).value = '';
+                document.getElementById(`hour-${room}`).value = '';
+                document.getElementById(`minute-${room}`).value = '';
+                document.getElementById(`desc-${room}`).value = '';
+                
+                showAlert(room, 'เพิ่มรายการประชุมสำเร็จ', 'success');
+                setTimeout(() => clearAlert(room), 3000);
+                
+                renderAllMeetings();
+                renderSummary();
+                
+            } catch (error) {
+                showAlert(room, 'เกิดข้อผิดพลาด: ' + error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>➕</span> เพิ่มรายการประชุม';
+            }
+        }
+
+        function handleDeleteMeeting(e) {
+            const btn = e.currentTarget;
+            const room = btn.dataset.room;
+            const id = parseInt(btn.dataset.id);
+            
+            // Show modal
+            const modal = document.getElementById('deleteModal');
+            modal.classList.add('active');
+            
+            // Handle confirm
+            const btnConfirm = document.getElementById('btnConfirm');
+            const newBtn = btnConfirm.cloneNode(true);
+            btnConfirm.parentNode.replaceChild(newBtn, btnConfirm);
+            
+            newBtn.addEventListener('click', async () => {
+                modal.classList.remove('active');
+                
+                try {
+                    await deleteMeeting(room, id);
+                    showAlert(room, 'ลบรายการประชุมสำเร็จ', 'success');
+                    setTimeout(() => clearAlert(room), 3000);
+                    
+                    renderAllMeetings();
+                    renderSummary();
+                } catch (error) {
+                    showAlert(room, 'เกิดข้อผิดพลาด: ' + error.message, 'error');
+                }
+            });
+            
+            // Handle cancel
+            document.getElementById('btnCancel').onclick = () => {
+                modal.classList.remove('active');
+            };
+            
+            modal.onclick = (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            };
+        }
+
+        // ==========================================
+        // TAB SWITCHING
+        // ==========================================
+        
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = tab.dataset.tab;
+                
+                // Update tabs
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Update content
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                document.getElementById(`${target}-tab`).classList.add('active');
+                
+                if (target === 'summary') {
+                    renderSummary();
+                }
+            });
+        });
+
+        // ==========================================
+        // WEEK CALCULATIONS
+        // ==========================================
+        
+        function getWeekNumber(date) {
+            const d = new Date(date);
+            d.setHours(0, 0, 0, 0);
+            d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+            const yearStart = new Date(d.getFullYear(), 0, 1);
+            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            return { year: d.getFullYear(), week: weekNo };
+        }
+
+        function getWeekRange(year, week) {
+            const simple = new Date(year, 0, 1 + (week - 1) * 7);
+            const dow = simple.getDay();
+            const start = new Date(simple);
+            
+            if (dow <= 4) {
+                start.setDate(simple.getDate() - simple.getDay() + 1);
+            } else {
+                start.setDate(simple.getDate() + 8 - simple.getDay());
+            }
+            
+            const end = new Date(start);
+            end.setDate(start.getDate() + 6);
+            
+            const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
+                           'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+            
+            const startStr = `${start.getDate()} ${months[start.getMonth()]}`;
+            const endStr = `${end.getDate()} ${months[end.getMonth()]} ${end.getFullYear() + 543}`;
+            
+            return `${startStr} - ${endStr}`;
+        }
+
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
+        
+        async function init() {
+            const grid = document.getElementById('roomsGrid');
+            grid.innerHTML = '<div class="loading"><div class="spinner"></div><div>กำลังโหลดข้อมูล...</div></div>';
+            
+            const success = await loadMeetings();
             
             if (success) {
-                RoomRenderer.renderAll();
-                SummaryRenderer.render();
+                renderRooms();
             } else {
-                document.getElementById('roomsGrid').innerHTML = `
+                grid.innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-state-icon">❌</div>
-                        <div>ไม่สามารถโหลดข้อมูลได้<br>กรุณาตรวจสอบการตั้งค่า API URL</div>
+                        <div class="empty-icon">❌</div>
+                        <div>ไม่สามารถโหลดข้อมูลได้<br>กรุณาตรวจสอบการเชื่อมต่อ</div>
                     </div>
                 `;
             }
         }
 
-        // Start
-        loadAllMeetings();
+        // Start application
+        init();
     </script>
 </body>
 </html>
