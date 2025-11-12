@@ -681,7 +681,7 @@
         // CONFIGURATION
         // ==========================================
         
-        const API_URL = 'https://script.google.com/macros/s/AKfycbwHt6vBpR29hCehcrjsAM7U7LRhpYHTWmQXKeL4GyORXxJGhMDBX7-q0nSlwB-JhaL2/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxJRvqFfUdrDylCm29jw6fDXA2KYUPmMeon1w8qH0mNtWBq5VycPyGUeeKQ4ljR-I8W/exec';
         
         const ROOMS = [
             'ห้องประชุมสมิหลา',
@@ -712,6 +712,20 @@
                     
                     if (Array.isArray(result.data)) {
                         result.data.forEach(meeting => {
+                            // Clean up date format (remove time portion if exists)
+                            if (meeting.date && typeof meeting.date === 'string') {
+                                meeting.date = meeting.date.split('T')[0];
+                            }
+                            
+                            // Clean up time format (extract HH:mm if full datetime)
+                            if (meeting.timeStart && typeof meeting.timeStart === 'string') {
+                                // If it's a full ISO datetime, extract just the time
+                                if (meeting.timeStart.includes('T')) {
+                                    const timePart = meeting.timeStart.split('T')[1];
+                                    meeting.timeStart = timePart.substring(0, 5); // Get HH:mm
+                                }
+                            }
+                            
                             if (meetingsData[meeting.room]) {
                                 meetingsData[meeting.room].push(meeting);
                             }
